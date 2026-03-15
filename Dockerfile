@@ -1,20 +1,23 @@
-# Use the official Python image
+# Use official Python image
 FROM python:3.9-slim-bookworm
 
-# Install ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg && apt-get clean
+# Install ffmpeg (lighter install)
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the dependencies file
+# Copy requirements
 COPY requirements.txt .
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip and install dependencies
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
+# Copy project files
 COPY . .
 
-# Run the bot
+# Run bot
 CMD ["python", "bot.py"]
